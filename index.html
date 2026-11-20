@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Health Supply Chain — Inventory Data Quality Validator</title>
+  <style>
+    :root {
+      /* Institutional Healthcare Color Palette */
+      --navy-950: #0a1628;
+      --navy-900: #0f2744;
+      --navy-800: #16365c;
+      --navy-700: #1e4976;
+      --navy-100: #e8eff7;
+      --navy-50:  #f3f7fb;
+
+      --teal-700: #0f766e;
+      --teal-600: #0d9488;
+      --teal-500: #14b8a6;
+      --teal-100: #ccfbf1;
+      --teal-50:  #f0fdfa;
+
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50:  #f8fafc;
+
+      --red-700:   #b91c1c;
+      --red-600:   #dc2626;
+      --red-100:   #fee2e2;
+      --red-50:    #fef2f2;
+
+      --amber-700: #b45309;
+      --amber-600: #d97706;
+      --amber-100: #fef3c7;
+      --amber-50:  #fffbeb;
+
+      --phc-blue:  #0369a1;
+      --phc-bg:    #f0f9ff;
+      --phc-border:#bae6fd;
+
+      --hc-indigo: #4338ca;
+      --hc-bg:     #eef2ff;
+      --hc-border: #c7d2fe;
+
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+
+      --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+      --shadow-card:   0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+      --shadow-elevated: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+      --shadow-modal:  0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--slate-50);
+      color: var(--slate-800);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Government Institutional Header */
+    header {
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--slate-200);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .top-institutional-bar {
+      background-color: var(--navy-950);
+      color: var(--slate-300);
+      font-size: 0.75rem;
+      padding: 0.35rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .top-institutional-bar span.agency-label {
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .top-institutional-bar span.system-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #34d399;
+      font-weight: 500;
+    }
+
+    .top-institutional-bar span.status-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #10b981;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: var(--slate-900);
+    }
+
+    .brand-emblem {
+      width: 38px;
+      height: 38px;
+      background: var(--navy-900);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 39, 68, 0.2);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--navy-950);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .brand-text p {
+      font-size: 0.775rem;
+      color: var(--slate-500);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.25rem;
+      list-style: none;
+      background-color: var(--slate-100);
+      padding: 3px;
+      border-radius: var(--radius-md);
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.5rem 0.95rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--slate-600);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--slate-900);
+    }
+
+    .nav-tab-btn.active {
+      background-color: #ffffff;
+      color: var(--navy-900);
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.5rem 0.9rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.12s ease-in-out;
+      text-decoration: none;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--navy-900);
+      color: #ffffff;
+      border-color: var(--navy-900);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--navy-800);
+      border-color: var(--navy-800);
+    }
+
+    .btn-teal {
+      background-color: var(--teal-600);
+      color: #ffffff;
+      border-color: var(--teal-600);
+    }
+
+    .btn-teal:hover {
+      background-color: var(--teal-700);
+      border-color: var(--teal-700);
+    }
+
+    .btn-outline {
+      background-color: #ffffff;
+      border-color: var(--slate-300);
+      color: var(--slate-700);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--slate-50);
+      border-color: var(--slate-400);
+      color: var(--slate-900);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.775rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1400px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .page-view {
+      display: none;
+    }
+
+    .page-view.active {
+      display: block;
+    }
+
+    /* Enterprise Metric Cards Strip */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 1024px) {
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem 1.25rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+      font-size: 0.775rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--slate-500);
+    }
+
+    .metric-icon-box {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--slate-100);
+      color: var(--slate-600);
+    }
+
+    .metric-card.alert-red .metric-icon-box {
+      background-color: var(--red-50);
+      color: var(--red-600);
+    }
+
+    .metric-card.alert-green .metric-icon-box {
+      background-color: var(--teal-50);
+      color: var(--teal-600);
+    }
+
+    .metric-card.alert-amber .metric-icon-box {
+      background-color: var(--amber-50);
+      color: var(--amber-600);
+    }
+
+    .metric-value {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--slate-900);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+
+    .metric-card.alert-red .metric-value {
+      color: var(--red-600);
+    }
+
+    .metric-card.alert-green .metric-value {
+      color: var(--teal-700);
+    }
+
+    .metric-footer {
+      font-size: 0.775rem;
+      color: var(--slate-500);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Cards */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 0.95rem 1.25rem;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      background-color: #ffffff;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy-950);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.775rem;
+      color: var(--slate-500);
+      margin-top: 2px;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    /* Control & Filter Panel */
+    .filter-panel {
+      background-color: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.1rem;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-width: 190px;
+      flex: 1;
+    }
+
+    .form-label {
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--slate-700);
+      letter-spacing: 0.01em;
+    }
+
+    .form-select, .form-input {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--slate-300);
+      border-radius: var(--radius-md);
+      font-size: 0.825rem;
+      color: var(--slate-800);
+      background-color: #ffffff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+
+    .form-select:focus, .form-input:focus {
+      border-color: var(--navy-700);
+      box-shadow: 0 0 0 3px rgba(30, 73, 118, 0.12);
+    }
+
+    /* Segmented Facility Level Filter */
+    .segmented-control {
+      display: inline-flex;
+      background: var(--slate-100);
+      padding: 3px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200);
+      gap: 2px;
+    }
+
+    .segmented-btn {
+      background: transparent;
+      border: none;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--slate-600);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.12s;
+    }
+
+    .segmented-btn:hover {
+      color: var(--slate-900);
+    }
+
+    .segmented-btn.active {
+      background: #ffffff;
+      color: var(--navy-900);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .segmented-btn.active.phc {
+      color: var(--phc-blue);
+    }
+
+    .segmented-btn.active.hc {
+      color: var(--hc-indigo);
+    }
+
+    /* Ingestion & Upload Section */
+    .ingestion-strip {
+      background-color: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .file-meta-box {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .file-icon-box {
+      width: 36px;
+      height: 36px;
+      background-color: var(--navy-50);
+      border: 1px solid var(--navy-100);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy-900);
+    }
+
+    .file-details-text h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slate-900);
+    }
+
+    .file-details-text p {
+      font-size: 0.775rem;
+      color: var(--slate-500);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.725rem;
+      font-weight: 600;
+      gap: 0.3rem;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    .badge-phc {
+      background: var(--phc-bg);
+      color: var(--phc-blue);
+      border: 1px solid var(--phc-border);
+    }
+
+    .badge-hc {
+      background: var(--hc-bg);
+      color: var(--hc-indigo);
+      border: 1px solid var(--hc-border);
+    }
+
+    .badge-danger {
+      background: var(--red-50);
+      color: var(--red-700);
+      border: 1px solid var(--red-100);
+    }
+
+    .badge-success {
+      background: var(--teal-50);
+      color: var(--teal-700);
+      border: 1px solid var(--teal-100);
+    }
+
+    .badge-warning {
+      background: var(--amber-50);
+      color: var(--amber-700);
+      border: 1px solid var(--amber-100);
+    }
+
+    .badge-neutral {
+      background: var(--slate-100);
+      color: var(--slate-700);
+      border: 1px solid var(--slate-200);
+    }
+
+    /* Enterprise Data Table */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.815rem;
+    }
+
+    thead th {
+      background-color: var(--slate-50);
+      color: var(--slate-700);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.65rem 0.9rem;
+      border-bottom: 1px solid var(--slate-200);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 0.65rem 0.9rem;
+      border-bottom: 1px solid var(--slate-200);
+      color: var(--slate-800);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .num-cell {
+      text-align: right;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.8rem;
+    }
+
+    .variance-chip {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+      font-size: 0.775rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .variance-deficit {
+      background-color: var(--red-50);
+      color: var(--red-700);
+      border: 1px solid var(--red-100);
+    }
+
+    .variance-surplus {
+      background-color: var(--amber-50);
+      color: var(--amber-700);
+      border: 1px solid var(--amber-100);
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .pagination-info {
+      font-size: 0.775rem;
+      color: var(--slate-500);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    /* Modal / Inspector */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      max-width: 640px;
+      width: 100%;
+      box-shadow: var(--shadow-modal);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    .modal-header {
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--slate-50);
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+    }
+
+    .math-breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .math-breakdown-table td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .math-breakdown-table tr.total-row td {
+      border-top: 2px solid var(--navy-900);
+      border-bottom: 2px solid var(--navy-900);
+      font-weight: 700;
+      background-color: var(--navy-50);
+      color: var(--navy-950);
+    }
+
+    /* Institutional Footer */
+    footer {
+      background-color: #ffffff;
+      border-top: 1px solid var(--slate-200);
+      padding: 1rem 1.5rem;
+      font-size: 0.775rem;
+      color: var(--slate-500);
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .icon {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Institutional Top Header -->
+  <header>
+    <div class="top-institutional-bar">
+      <span class="agency-label">National Health Logistics Information System • Supply Chain Data Quality Assurance</span>
+      <span class="system-status">
+        <span class="status-indicator"></span>
+        DQM Audit Engine Active
+      </span>
+    </div>
+
+    <div class="nav-container">
+      <div class="brand-section">
+        <div class="brand-emblem">
+          <svg class="icon" style="width: 20px; height: 20px;" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Inventory Data Quality Validator</h1>
+          <p>Public Health Commodity Balance Audit & Reconciliation</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <ul class="nav-tabs">
+        <li>
+          <button class="nav-tab-btn active" id="tab-home" onclick="switchPage('home')">
+            <svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Audit & Review
+          </button>
+        </li>
+        <li>
+          <button class="nav-tab-btn" id="tab-facilities" onclick="switchPage('facilities')">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>
+            Facility Performance
+          </button>
+        </li>
+        <li>
+          <button class="nav-tab-btn" id="tab-analytics" onclick="switchPage('analytics')">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+            Commodity Discrepancies
+          </button>
+        </li>
+        <li>
+          <button class="nav-tab-btn" id="tab-guide" onclick="switchPage('guide')">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            Audit SOP & Mapping
+          </button>
+        </li>
+      </ul>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <button class="btn btn-outline btn-sm" onclick="loadSampleData()">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Load Demo Dataset
+        </button>
+        <button class="btn btn-primary btn-sm" id="btn-download-flagged-nav" onclick="downloadFlaggedCsv()" disabled>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Export flagged.csv
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main>
+
+    <!-- ========================================== -->
+    <!-- 1. HOME: AUDIT & REVIEW VIEW -->
+    <!-- ========================================== -->
+    <div id="page-home" class="page-view active">
+
+      <!-- Executive Metric Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Line Items Audited</span>
+            <div class="metric-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+          </div>
+          <div class="metric-value" id="kpi-total">0</div>
+          <div class="metric-footer">
+            <span id="kpi-sub-total">Awaiting CSV ingestion</span>
+          </div>
+        </div>
+
+        <div class="metric-card alert-green">
+          <div class="metric-header">
+            <span class="metric-label">Reconciled Items</span>
+            <div class="metric-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="metric-value" id="kpi-balanced">0</div>
+          <div class="metric-footer">
+            <span id="kpi-sub-balanced">0% balanced rate</span>
+          </div>
+        </div>
+
+        <div class="metric-card alert-red">
+          <div class="metric-header">
+            <span class="metric-label">Flagged Discrepancies</span>
+            <div class="metric-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            </div>
+          </div>
+          <div class="metric-value" id="kpi-flagged">0</div>
+          <div class="metric-footer">
+            <span id="kpi-sub-flagged">0% audit variance</span>
+          </div>
+        </div>
+
+        <div class="metric-card alert-amber">
+          <div class="metric-header">
+            <span class="metric-label">Facilities Affected</span>
+            <div class="metric-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/></svg>
+            </div>
+          </div>
+          <div class="metric-value" id="kpi-facilities">0</div>
+          <div class="metric-footer">
+            <span id="kpi-sub-facilities">Requiring supervisory follow-up</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Ingestion Summary Strip / Dropzone -->
+      <div id="ingestion-section" class="ingestion-strip">
+        <div class="file-meta-box">
+          <div class="file-icon-box">
+            <svg class="icon" style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+          </div>
+          <div class="file-details-text">
+            <h4 id="active-file-title">No dataset loaded</h4>
+            <p id="active-file-details">
+              <span>Required equation: Ending = Beginning + Received − Dispensed − Losses</span>
+            </p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="file" id="csv-file-input" accept=".csv, .tsv, .txt" style="display: none;" onchange="handleFileSelected(event)">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('csv-file-input').click()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            Upload Inventory CSV
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="downloadBlankTemplate()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+            Blank Template
+          </button>
+        </div>
+      </div>
+
+      <!-- Audit Filters Bar -->
+      <div class="filter-panel">
+        <!-- Facility Level (PHC or HC) -->
+        <div class="form-group" style="flex: 1.2;">
+          <label class="form-label">Facility Classification</label>
+          <div class="segmented-control">
+            <button type="button" class="segmented-btn active" id="btn-type-all" onclick="setFacilityTypeFilter('ALL')">
+              All Levels (<span id="count-type-all">0</span>)
+            </button>
+            <button type="button" class="segmented-btn phc" id="btn-type-phc" onclick="setFacilityTypeFilter('PHC')">
+              PHC (<span id="count-type-phc">0</span>)
+            </button>
+            <button type="button" class="segmented-btn hc" id="btn-type-hc" onclick="setFacilityTypeFilter('HC')">
+              HC (<span id="count-type-hc">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- Facility Dropdown Filter -->
+        <div class="form-group" style="flex: 2;">
+          <label class="form-label" for="facility-select">Filter by Health Facility</label>
+          <select id="facility-select" class="form-select" onchange="applyFilters()">
+            <option value="ALL">All Facilities (All reporting sites)</option>
+          </select>
+        </div>
+
+        <!-- Discrepancy Classification -->
+        <div class="form-group" style="flex: 1.5;">
+          <label class="form-label" for="discrepancy-select">Discrepancy Category</label>
+          <select id="discrepancy-select" class="form-select" onchange="applyFilters()">
+            <option value="ALL">All Flagged Discrepancies</option>
+            <option value="DEFICIT">Deficit Shortage (Reported &lt; Calculated)</option>
+            <option value="SURPLUS">Excess Surplus (Reported &gt; Calculated)</option>
+            <option value="NEGATIVE">Negative Inventory Movement</option>
+          </select>
+        </div>
+
+        <!-- Search Input -->
+        <div class="form-group" style="flex: 1.5;">
+          <label class="form-label" for="search-input">Search Commodity / Facility</label>
+          <input type="text" id="search-input" class="form-input" placeholder="Filter by product name, drug, site..." oninput="applyFilters()">
+        </div>
+      </div>
+
+      <!-- Review Table Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-title">
+              Audit Review Panel
+              <span id="filtered-count-badge" class="badge badge-danger">0 Flagged</span>
+            </span>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-outline btn-sm" onclick="downloadFilteredCsv()" id="btn-download-filtered" disabled>
+              Export Filtered Subset
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="downloadFlaggedCsv()" id="btn-download-flagged" disabled>
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Export flagged.csv (<span id="download-btn-count">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding: 0.75rem 1.25rem 1.25rem;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 55px;">Line</th>
+                  <th>Facility Name</th>
+                  <th>Level</th>
+                  <th>Commodity Description</th>
+                  <th class="num-cell">Opening (BB)</th>
+                  <th class="num-cell">Received (+)</th>
+                  <th class="num-cell">Dispensed (−)</th>
+                  <th class="num-cell">Loss / Adj (−)</th>
+                  <th class="num-cell">Calculated</th>
+                  <th class="num-cell">Reported</th>
+                  <th class="num-cell">Variance</th>
+                  <th>Audit Note</th>
+                  <th style="text-align: center; width: 85px;">Audit Action</th>
+                </tr>
+              </thead>
+              <tbody id="flagged-table-body">
+                <tr>
+                  <td colspan="13" style="text-align: center; padding: 2.5rem; color: var(--slate-500);">
+                    No flagged records found. Please upload an inventory report or click "Load Demo Dataset".
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar">
+            <div class="pagination-info" id="pagination-info">
+              Showing 0 of 0 records
+            </div>
+            <div class="pagination-controls" id="pagination-buttons">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. FACILITIES DIRECTORY & SCORECARD -->
+    <!-- ========================================== -->
+    <div id="page-facilities" class="page-view">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Facility Logistics Performance Scorecard</h2>
+            <p class="card-subtitle">Compliance tracking across Primary Health Centres (PHC) and Health Centres (HC)</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="facility-search-text" class="form-input" style="width: 260px;" placeholder="Filter facility name..." oninput="renderFacilitiesTable()">
+          </div>
+        </div>
+        <div class="card-body" style="padding: 0.75rem 1.25rem 1.25rem;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Facility Name</th>
+                  <th>Level</th>
+                  <th class="num-cell">Items Audited</th>
+                  <th class="num-cell">Balanced Items</th>
+                  <th class="num-cell">Flagged Items</th>
+                  <th>Discrepancy Rate</th>
+                  <th>Compliance Status</th>
+                  <th style="text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="facilities-table-body">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 2rem; color: var(--slate-500);">
+                    No facility records available.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. COMMODITY DISCREPANCY ANALYSIS -->
+    <!-- ========================================== -->
+    <div id="page-analytics" class="page-view">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+        
+        <!-- Level Comparison Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Facility Level Comparison (PHC vs HC)</h2>
+          </div>
+          <div class="card-body" id="analytics-type-breakdown">
+            <p style="color: var(--slate-500); font-size: 0.85rem;">Load a dataset to generate comparisons.</p>
+          </div>
+        </div>
+
+        <!-- Error Category Distribution -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Audit Discrepancy Categorization</h2>
+          </div>
+          <div class="card-body" id="analytics-error-categories">
+            <p style="color: var(--slate-500); font-size: 0.85rem;">Load a dataset to generate distribution breakdown.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Top High-Variance Commodities -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">High-Risk Commodities by Discrepancy Volume</h2>
+        </div>
+        <div class="card-body" style="padding: 0.75rem 1.25rem 1.25rem;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Commodity Description</th>
+                  <th class="num-cell">Total Audited</th>
+                  <th class="num-cell">Flagged Occurrences</th>
+                  <th>Discrepancy Frequency</th>
+                  <th class="num-cell">Total Variance Units</th>
+                </tr>
+              </thead>
+              <tbody id="analytics-commodities-body">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 2rem; color: var(--slate-500);">
+                    No commodity statistics currently available.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. AUDIT SOP & MAPPING GUIDE -->
+    <!-- ========================================== -->
+    <div id="page-guide" class="page-view">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Standard Operating Procedure (SOP) & Data Specification</h2>
+        </div>
+        <div class="card-body" style="font-size: 0.875rem; color: var(--slate-700); line-height: 1.6;">
+          <h3 style="font-size: 1rem; color: var(--navy-950); margin-bottom: 0.5rem;">1. Core Stock Conservation Principle</h3>
+          <p style="margin-bottom: 0.85rem;">
+            Public health inventory auditing relies on mathematical stock conservation. For any reporting period, physical inventory movements must follow:
+          </p>
+          <div style="background-color: var(--navy-50); border-left: 3px solid var(--navy-900); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-family: ui-monospace, monospace; font-size: 0.875rem; color: var(--navy-950); margin-bottom: 1.25rem;">
+            Calculated Ending Balance = Beginning Balance + Quantity Received − Quantity Dispensed − Losses &amp; Adjustments
+          </div>
+
+          <h3 style="font-size: 1rem; color: var(--navy-950); margin-bottom: 0.5rem;">2. Supported Column Header Synonyms</h3>
+          <p style="margin-bottom: 0.85rem;">
+            The validator automatically identifies headers across varying eLMIS, DHIS2, and warehouse management software formats:
+          </p>
+
+          <div class="table-container" style="margin-bottom: 1.25rem;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Internal Field</th>
+                  <th>Functional Definition</th>
+                  <th>Recognized Column Synonyms</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Beginning Balance</strong></td>
+                  <td>Opening inventory at period start</td>
+                  <td><code>Beginning Balance</code>, <code>Opening Balance</code>, <code>Start Balance</code>, <code>BB</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Received</strong></td>
+                  <td>Quantity received from stores or higher-level depots</td>
+                  <td><code>Received</code>, <code>Quantity Received</code>, <code>Receipts</code>, <code>Stock Received</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Dispensed</strong></td>
+                  <td>Quantity dispensed to patients/clients</td>
+                  <td><code>Dispensed</code>, <code>Quantity Dispensed</code>, <code>Consumption</code>, <code>Issued</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Losses Adjustment</strong></td>
+                  <td>Damages, expiries, inventory shrinkage, transfers</td>
+                  <td><code>Losses Adjustment</code>, <code>Losses and Adjustments</code>, <code>Losses</code>, <code>Adjustments</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Ending Balance</strong></td>
+                  <td>Physical count conducted at end of reporting cycle</td>
+                  <td><code>Ending Balance</code>, <code>Closing Balance</code>, <code>Physical Count</code>, <code>EB</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Facility Name</strong></td>
+                  <td>Reporting healthcare facility identifier</td>
+                  <td><code>Facility Name</code>, <code>Facility</code>, <code>Health Centre</code>, <code>Site</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Facility Type</strong></td>
+                  <td>Healthcare tier classification</td>
+                  <td><code>Facility Type</code>, <code>Classification</code>, <code>Type</code>, <code>Level</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary btn-sm" onclick="downloadBlankTemplate()">
+              Download Blank CSV Template
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="loadSampleData()">
+              Load 120-Row Demonstration Dataset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Step-by-Step Calculation Audit Modal -->
+  <div id="math-modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-title" style="font-size: 0.975rem; font-weight: 700; color: var(--navy-950);">Inventory Calculation Audit</h3>
+          <p id="modal-subtitle" style="font-size: 0.75rem; color: var(--slate-500); margin-top: 1px;">Facility & Line Audit</p>
+        </div>
+        <button onclick="closeModal()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--slate-400);">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-content">
+          <!-- Populated dynamically -->
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 0.75rem;">
+          <button class="btn btn-outline btn-sm" onclick="closeModal()">Close Audit View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Institutional Footer -->
+  <footer>
+    <div class="footer-inner">
+      <span>MedBalance Public Health Supply Chain Validator • Official Data Quality Platform</span>
+      <span>Compliant with Global Fund, USAID GHSC-PSM &amp; WHO Inventory Audit Standards</span>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    const state = {
+      rawCsvText: '',
+      filename: 'sample_inventory_data.csv',
+      allRows: [],
+      flaggedRows: [],
+      balancedRows: [],
+      facilities: [],
+      facilityTypes: ['PHC', 'HC'],
+      facilityStats: {},
+      headers: [],
+      columnMapping: {},
+      
+      activeTypeFilter: 'ALL',
+      activeFacilityFilter: 'ALL',
+      activeDiscrepancyFilter: 'ALL',
+      searchQuery: '',
+
+      currentPage: 1,
+      pageSize: 15
+    };
+
+    const COLUMN_ALIASES = {
+      facility: ['facility', 'facility_name', 'facility name', 'health_facility', 'health facility', 'site', 'centre', 'center', 'clinic'],
+      facility_type: ['facility_type', 'facility type', 'type', 'classification', 'facility_classification', 'level', 'tier'],
+      commodity: ['commodity', 'commodity_name', 'commodity name', 'product', 'product_name', 'item', 'item_name', 'drug', 'medicine', 'description'],
+      beginning_balance: ['beginning balance', 'beginning_balance', 'beg balance', 'opening balance', 'opening_balance', 'start balance', 'bb', 'ob'],
+      received: ['received', 'quantity received', 'quantity_received', 'qty received', 'receipts', 'rec'],
+      dispensed: ['dispensed', 'quantity dispensed', 'quantity_dispensed', 'qty dispensed', 'consumption', 'issued', 'disp'],
+      losses_adjustment: ['losses adjustment', 'losses_adjustment', 'loss adjustment', 'losses and adjustments', 'losses / adjustments', 'losses', 'loss', 'adjustments', 'adjustment', 'loss/adj'],
+      ending_balance: ['ending balance', 'ending_balance', 'closing balance', 'physical count', 'physical stock', 'eb', 'cb']
+    };
+
+    function normalizeHeader(h) {
+      if (!h) return '';
+      return h.trim().toLowerCase().replace(/[\r\n\t]+/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+    }
+
+    function autoMapHeaders(headers) {
+      const mapping = {};
+      const normHeaders = headers.map(h => ({ raw: h, norm: normalizeHeader(h) }));
+
+      for (const [key, aliases] of Object.entries(COLUMN_ALIASES)) {
+        mapping[key] = null;
+        for (const nh of normHeaders) {
+          if (aliases.includes(nh.norm)) {
+            mapping[key] = nh.raw;
+            break;
+          }
+        }
+        if (!mapping[key]) {
+          for (const nh of normHeaders) {
+            for (const alias of aliases) {
+              if (nh.norm.includes(alias) || alias.includes(nh.norm)) {
+                if (key === 'facility' && nh.norm.includes('type')) continue;
+                mapping[key] = nh.raw;
+                break;
+              }
+            }
+            if (mapping[key]) break;
+          }
+        }
+      }
+      return mapping;
+    }
+
+    function inferFacilityType(name, explicitType) {
+      if (explicitType) {
+        const u = String(explicitType).trim().toUpperCase();
+        if (u.includes('PHC') || u.includes('PRIMARY')) return 'PHC';
+        if (u.includes('HC') || u.includes('HEALTH CENTRE') || u.includes('CENTER') || u.includes('HOSPITAL') || u.includes('CLINIC')) return 'HC';
+        return u;
+      }
+      const nu = (name || '').toUpperCase();
+      if (nu.includes('PHC') || nu.includes('PRIMARY')) return 'PHC';
+      if (nu.includes('HC') || nu.includes('HEALTH CENTRE') || nu.includes('CENTER') || nu.includes('CLINIC') || nu.includes('HOSPITAL')) return 'HC';
+      return 'PHC';
+    }
+
+    function parseNumeric(val) {
+      if (val === null || val === undefined) return { val: 0.0, err: null };
+      const s = String(val).trim();
+      if (s === '' || ['na', 'n/a', 'null', 'none', '-'].includes(s.toLowerCase())) {
+        return { val: 0.0, err: null };
+      }
+      const cleaned = s.replace(/[,\s$£€]/g, '');
+      const num = Number(cleaned);
+      if (isNaN(num)) {
+        return { val: null, err: `Non-numeric value: '${s}'` };
+      }
+      return { val: num, err: null };
+    }
+
+    function parseCSV(text) {
+      text = text.replace(/^\uFEFF/, '');
+      const lines = [];
+      let row = [];
+      let inQuotes = false;
+      let currentVal = '';
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            currentVal += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if ((char === ',' || char === ';') && !inQuotes) {
+          row.push(currentVal.trim());
+          currentVal = '';
+        } else if ((char === '\r' || char === '\n') && !inQuotes) {
+          if (char === '\r' && nextChar === '\n') {
+            i++;
+          }
+          row.push(currentVal.trim());
+          currentVal = '';
+          if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+            lines.push(row);
+          }
+          row = [];
+        } else {
+          currentVal += char;
+        }
+      }
+
+      if (currentVal || row.length > 0) {
+        row.push(currentVal.trim());
+        lines.push(row);
+      }
+
+      if (lines.length === 0) return { headers: [], rows: [] };
+      const headers = lines[0];
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const obj = {};
+        for (let j = 0; j < headers.length; j++) {
+          obj[headers[j]] = line[j] !== undefined ? line[j] : '';
+        }
+        rows.push(obj);
+      }
+      return { headers, rows };
+    }
+
+    function processData(csvText, filename = 'inventory.csv') {
+      state.rawCsvText = csvText;
+      state.filename = filename;
+      
+      const parsed = parseCSV(csvText);
+      state.headers = parsed.headers;
+      state.columnMapping = autoMapHeaders(parsed.headers);
+      const mapping = state.columnMapping;
+
+      const flagged = [];
+      const balanced = [];
+      const facSet = new Set();
+      const facStats = {};
+
+      parsed.rows.forEach((row, idx) => {
+        const rowNum = idx + 1;
+        const rawFac = (mapping.facility && row[mapping.facility]) ? row[mapping.facility].trim() : `Facility ${rowNum}`;
+        const rawType = (mapping.facility_type && row[mapping.facility_type]) ? row[mapping.facility_type].trim() : null;
+        const facType = inferFacilityType(rawFac, rawType);
+        const commodity = (mapping.commodity && row[mapping.commodity]) ? row[mapping.commodity].trim() : 'General Commodity';
+
+        facSet.add(rawFac);
+        if (!facStats[rawFac]) {
+          facStats[rawFac] = {
+            name: rawFac,
+            type: facType,
+            total: 0,
+            balanced: 0,
+            flagged: 0,
+            totalDiscrepancy: 0
+          };
+        }
+        facStats[rawFac].total++;
+
+        const bb = parseNumeric(row[mapping.beginning_balance]);
+        const rec = parseNumeric(row[mapping.received]);
+        const disp = parseNumeric(row[mapping.dispensed]);
+        const loss = parseNumeric(row[mapping.losses_adjustment]);
+        
+        const hasEbCol = Boolean(mapping.ending_balance && row[mapping.ending_balance] !== undefined && row[mapping.ending_balance] !== '');
+        const eb = hasEbCol ? parseNumeric(row[mapping.ending_balance]) : { val: null, err: null };
+
+        let isFlagged = false;
+        const reasons = [];
+        let calculatedEb = 0.0;
+        let discrepancy = 0.0;
+        let errorCategory = 'MATH';
+
+        if (bb.err || rec.err || disp.err || loss.err || eb.err) {
+          isFlagged = true;
+          errorCategory = 'FORMAT';
+          [bb.err, rec.err, disp.err, loss.err, eb.err].forEach(e => { if (e) reasons.push(e); });
+        } else {
+          if (bb.val < 0) { isFlagged = true; reasons.push(`Negative Beginning Balance (${bb.val})`); }
+          if (rec.val < 0) { isFlagged = true; reasons.push(`Negative Received Quantity (${rec.val})`); }
+          if (disp.val < 0) { isFlagged = true; reasons.push(`Negative Dispensed Quantity (${disp.val})`); }
+
+          calculatedEb = bb.val + rec.val - disp.val - loss.val;
+
+          if (calculatedEb < -0.001) {
+            isFlagged = true;
+            errorCategory = 'NEGATIVE';
+            const deficit = Math.abs(calculatedEb).toFixed(2);
+            reasons.push(`Negative Stock: Consumption (${disp.val + loss.val}) exceeds stock (${bb.val + rec.val}) by ${deficit}`);
+          }
+
+          if (hasEbCol && eb.val !== null) {
+            const diff = Number((eb.val - calculatedEb).toFixed(2));
+            if (Math.abs(diff) > 0.001) {
+              isFlagged = true;
+              discrepancy = diff;
+              if (diff > 0) {
+                errorCategory = 'SURPLUS';
+                reasons.push(`Surplus Discrepancy: Count (${eb.val}) > Formula (${calculatedEb.toFixed(2)}) by +${diff}`);
+              } else {
+                errorCategory = 'DEFICIT';
+                reasons.push(`Deficit Discrepancy: Count (${eb.val}) < Formula (${calculatedEb.toFixed(2)}) by ${diff}`);
+              }
+            }
+          }
+        }
+
+        const item = {
+          rowNum,
+          facility: rawFac,
+          facilityType: facType,
+          commodity,
+          beginningBalance: bb.val !== null ? bb.val : row[mapping.beginning_balance],
+          received: rec.val !== null ? rec.val : row[mapping.received],
+          dispensed: disp.val !== null ? disp.val : row[mapping.dispensed],
+          lossesAdjustment: loss.val !== null ? loss.val : row[mapping.losses_adjustment],
+          calculatedEndingBalance: Number(calculatedEb.toFixed(2)),
+          reportedEndingBalance: (hasEbCol && eb.val !== null) ? eb.val : (hasEbCol ? row[mapping.ending_balance] : 'N/A'),
+          discrepancy: Number(discrepancy.toFixed(2)),
+          isFlagged,
+          errorCategory,
+          reasons,
+          reasonStr: reasons.length ? reasons.join('; ') : 'Balanced',
+          rawRow: row
+        };
+
+        if (isFlagged) {
+          flagged.push(item);
+          facStats[rawFac].flagged++;
+          facStats[rawFac].totalDiscrepancy += Math.abs(discrepancy);
+        } else {
+          balanced.push(item);
+          facStats[rawFac].balanced++;
+        }
+      });
+
+      state.allRows = [...flagged, ...balanced];
+      state.flaggedRows = flagged;
+      state.balancedRows = balanced;
+      state.facilities = Array.from(facSet).sort();
+      state.facilityStats = facStats;
+
+      updateUI();
+    }
+
+    function updateUI() {
+      const total = state.allRows.length;
+      const flaggedCount = state.flaggedRows.length;
+      const balancedCount = state.balancedRows.length;
+
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-sub-total').textContent = `Audited from ${state.filename}`;
+      
+      document.getElementById('kpi-flagged').textContent = flaggedCount;
+      const rate = total > 0 ? ((flaggedCount / total) * 100).toFixed(1) : 0;
+      document.getElementById('kpi-sub-flagged').textContent = `${rate}% error rate`;
+
+      document.getElementById('kpi-balanced').textContent = balancedCount;
+      document.getElementById('kpi-sub-balanced').textContent = `${total > 0 ? (100 - rate).toFixed(1) : 0}% compliant`;
+
+      const flaggedFacilitiesCount = Object.values(state.facilityStats).filter(f => f.flagged > 0).length;
+      document.getElementById('kpi-facilities').textContent = flaggedFacilitiesCount;
+      document.getElementById('kpi-sub-facilities').textContent = `Out of ${state.facilities.length} active facilities`;
+
+      document.getElementById('active-file-title').textContent = state.filename;
+      document.getElementById('active-file-details').innerHTML = `
+        <span><strong>${total}</strong> line items</span> • 
+        <span><strong>${state.facilities.length}</strong> facilities</span> • 
+        <span>Auto-mapped columns: BB, REC, DISP, LOSS</span>
+      `;
+
+      const facSelect = document.getElementById('facility-select');
+      const currentSelected = facSelect.value;
+      facSelect.innerHTML = '<option value="ALL">All Facilities (All reporting sites)</option>';
+      state.facilities.forEach(fac => {
+        const opt = document.createElement('option');
+        opt.value = fac;
+        const facType = state.facilityStats[fac] ? state.facilityStats[fac].type : '';
+        const flCount = state.facilityStats[fac] ? state.facilityStats[fac].flagged : 0;
+        opt.textContent = `${fac} [${facType}] (${flCount} discrepancies)`;
+        facSelect.appendChild(opt);
+      });
+      if (state.facilities.includes(currentSelected)) {
+        facSelect.value = currentSelected;
+      }
+
+      let phcCount = 0;
+      let hcCount = 0;
+      state.flaggedRows.forEach(r => {
+        if (r.facilityType === 'PHC') phcCount++;
+        else if (r.facilityType === 'HC') hcCount++;
+      });
+      document.getElementById('count-type-all').textContent = flaggedCount;
+      document.getElementById('count-type-phc').textContent = phcCount;
+      document.getElementById('count-type-hc').textContent = hcCount;
+
+      const hasFlagged = flaggedCount > 0;
+      document.getElementById('btn-download-flagged').disabled = !hasFlagged;
+      document.getElementById('btn-download-flagged-nav').disabled = !hasFlagged;
+      document.getElementById('btn-download-filtered').disabled = !hasFlagged;
+      document.getElementById('download-btn-count').textContent = flaggedCount;
+
+      applyFilters();
+      renderFacilitiesTable();
+      renderAnalytics();
+    }
+
+    function setFacilityTypeFilter(type) {
+      state.activeTypeFilter = type;
+      document.getElementById('btn-type-all').classList.toggle('active', type === 'ALL');
+      document.getElementById('btn-type-phc').classList.toggle('active', type === 'PHC');
+      document.getElementById('btn-type-hc').classList.toggle('active', type === 'HC');
+      state.currentPage = 1;
+      applyFilters();
+    }
+
+    function getFilteredRows() {
+      const typeFilter = state.activeTypeFilter;
+      const facFilter = document.getElementById('facility-select').value;
+      const discFilter = document.getElementById('discrepancy-select').value;
+      const search = (document.getElementById('search-input').value || '').trim().toLowerCase();
+
+      return state.flaggedRows.filter(row => {
+        if (typeFilter !== 'ALL' && row.facilityType !== typeFilter) return false;
+        if (facFilter !== 'ALL' && row.facility !== facFilter) return false;
+
+        if (discFilter === 'DEFICIT' && row.errorCategory !== 'DEFICIT') return false;
+        if (discFilter === 'SURPLUS' && row.errorCategory !== 'SURPLUS') return false;
+        if (discFilter === 'NEGATIVE' && row.errorCategory !== 'NEGATIVE') return false;
+
+        if (search) {
+          const matchCommodity = row.commodity.toLowerCase().includes(search);
+          const matchFac = row.facility.toLowerCase().includes(search);
+          const matchReason = row.reasonStr.toLowerCase().includes(search);
+          if (!matchCommodity && !matchFac && !matchReason) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function applyFilters() {
+      const filtered = getFilteredRows();
+      document.getElementById('filtered-count-badge').textContent = `${filtered.length} Flagged`;
+      
+      const totalPages = Math.ceil(filtered.length / state.pageSize) || 1;
+      if (state.currentPage > totalPages) state.currentPage = 1;
+
+      renderTable(filtered);
+      renderPagination(filtered.length, totalPages);
+    }
+
+    function renderTable(filteredRows) {
+      const tbody = document.getElementById('flagged-table-body');
+      tbody.innerHTML = '';
+
+      if (filteredRows.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="13" style="text-align: center; padding: 2.5rem; color: var(--slate-500);">
+              No flagged discrepancies match the selected filter criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = Math.min(start + state.pageSize, filteredRows.length);
+      const pageRows = filteredRows.slice(start, end);
+
+      pageRows.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        const typeBadge = item.facilityType === 'PHC' 
+          ? `<span class="badge badge-phc">PHC</span>` 
+          : `<span class="badge badge-hc">HC</span>`;
+
+        let varPill = `<span style="color: var(--slate-400);">-</span>`;
+        if (item.discrepancy < 0) {
+          varPill = `<span class="variance-chip variance-deficit">${item.discrepancy}</span>`;
+        } else if (item.discrepancy > 0) {
+          varPill = `<span class="variance-chip variance-surplus">+${item.discrepancy}</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="num-cell" style="color: var(--slate-400);">${item.rowNum}</td>
+          <td><strong style="color: var(--navy-950);">${escapeHtml(item.facility)}</strong></td>
+          <td>${typeBadge}</td>
+          <td>${escapeHtml(item.commodity)}</td>
+          <td class="num-cell">${item.beginningBalance}</td>
+          <td class="num-cell" style="color: var(--teal-700); font-weight: 600;">+${item.received}</td>
+          <td class="num-cell" style="color: var(--slate-700);">−${item.dispensed}</td>
+          <td class="num-cell" style="color: var(--slate-500);">−${item.lossesAdjustment}</td>
+          <td class="num-cell" style="font-weight: 700; color: var(--navy-900);">${item.calculatedEndingBalance}</td>
+          <td class="num-cell">${item.reportedEndingBalance}</td>
+          <td class="num-cell">${varPill}</td>
+          <td style="max-width: 260px; font-size: 0.775rem; color: var(--red-700);">
+            ${escapeHtml(item.reasonStr)}
+          </td>
+          <td style="text-align: center;">
+            <button class="btn btn-outline btn-sm" onclick="openMathModal(${item.rowNum})">
+              Audit
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPagination(totalItems, totalPages) {
+      const info = document.getElementById('pagination-info');
+      const container = document.getElementById('pagination-buttons');
+      container.innerHTML = '';
+
+      if (totalItems === 0) {
+        info.textContent = 'Showing 0 records';
+        return;
+      }
+
+      const start = (state.currentPage - 1) * state.pageSize + 1;
+      const end = Math.min(start + state.pageSize - 1, totalItems);
+      info.textContent = `Showing line items ${start} to ${end} of ${totalItems} flagged records`;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'btn btn-outline btn-sm';
+      prevBtn.textContent = 'Previous';
+      prevBtn.disabled = state.currentPage === 1;
+      prevBtn.onclick = () => { state.currentPage--; applyFilters(); };
+      container.appendChild(prevBtn);
+
+      let pStart = Math.max(1, state.currentPage - 2);
+      let pEnd = Math.min(totalPages, pStart + 4);
+      if (pEnd - pStart < 4) pStart = Math.max(1, pEnd - 4);
+
+      for (let p = pStart; p <= pEnd; p++) {
+        const pBtn = document.createElement('button');
+        pBtn.className = `btn btn-sm ${p === state.currentPage ? 'btn-primary' : 'btn-outline'}`;
+        pBtn.textContent = p;
+        pBtn.onclick = ((page) => () => { state.currentPage = page; applyFilters(); })(p);
+        container.appendChild(pBtn);
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'btn btn-outline btn-sm';
+      nextBtn.textContent = 'Next';
+      nextBtn.disabled = state.currentPage === totalPages;
+      nextBtn.onclick = () => { state.currentPage++; applyFilters(); };
+      container.appendChild(nextBtn);
+    }
+
+    function openMathModal(rowNum) {
+      const item = state.allRows.find(r => r.rowNum === rowNum);
+      if (!item) return;
+
+      document.getElementById('modal-title').textContent = `Audit Trail: Line Item #${item.rowNum}`;
+      document.getElementById('modal-subtitle').textContent = `${item.facility} [${item.facilityType}] — ${item.commodity}`;
+
+      const modalContent = document.getElementById('modal-content');
+      modalContent.innerHTML = `
+        <table class="math-breakdown-table">
+          <tr>
+            <td>(+) Beginning Balance (Opening Inventory)</td>
+            <td class="num-cell"><strong>${item.beginningBalance}</strong></td>
+          </tr>
+          <tr>
+            <td style="color: var(--teal-700);">(+) Quantity Received (Central Logistics)</td>
+            <td class="num-cell" style="color: var(--teal-700);"><strong>+${item.received}</strong></td>
+          </tr>
+          <tr>
+            <td style="color: var(--slate-700);">(−) Quantity Dispensed (Patient Consumption)</td>
+            <td class="num-cell" style="color: var(--slate-700);"><strong>−${item.dispensed}</strong></td>
+          </tr>
+          <tr>
+            <td style="color: var(--slate-600);">(−) Losses and Adjustments</td>
+            <td class="num-cell" style="color: var(--slate-600);"><strong>−${item.lossesAdjustment}</strong></td>
+          </tr>
+          <tr class="total-row">
+            <td>(=) Calculated Stock Balance (Audit Standard)</td>
+            <td class="num-cell"><strong>${item.calculatedEndingBalance}</strong></td>
+          </tr>
+          <tr>
+            <td>Reported Physical Count:</td>
+            <td class="num-cell"><strong>${item.reportedEndingBalance}</strong></td>
+          </tr>
+          <tr style="background-color: ${item.discrepancy !== 0 ? 'var(--red-50)' : 'var(--teal-50)'};">
+            <td style="font-weight: 700; color: ${item.discrepancy !== 0 ? 'var(--red-700)' : 'var(--teal-700)'};">
+              Variance (Reported − Calculated):
+            </td>
+            <td class="num-cell" style="font-weight: 700; color: ${item.discrepancy !== 0 ? 'var(--red-700)' : 'var(--teal-700)'}; font-size: 0.95rem;">
+              ${item.discrepancy > 0 ? '+' : ''}${item.discrepancy} units
+            </td>
+          </tr>
+        </table>
+        
+        <div style="background-color: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; font-size: 0.8rem; color: var(--slate-700);">
+          <strong>Supervisory Action:</strong> ${escapeHtml(item.reasonStr)}. Cross-examine facility stock card (Form LMIS-01) against bin card and dispensing registers.
+        </div>
+      `;
+
+      document.getElementById('math-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('math-modal').classList.remove('active');
+    }
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+
+      const target = document.getElementById(`page-${pageId}`);
+      const targetBtn = document.getElementById(`tab-${pageId}`);
+      if (target) target.classList.add('active');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (pageId === 'facilities') renderFacilitiesTable();
+      if (pageId === 'analytics') renderAnalytics();
+    }
+
+    function renderFacilitiesTable() {
+      const tbody = document.getElementById('facilities-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const query = (document.getElementById('facility-search-text')?.value || '').toLowerCase();
+      const facList = Object.values(state.facilityStats).filter(f => f.name.toLowerCase().includes(query));
+
+      if (facList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--slate-500);">No facility records matching filter.</td></tr>`;
+        return;
+      }
+
+      facList.forEach(fac => {
+        const rate = fac.total > 0 ? ((fac.flagged / fac.total) * 100).toFixed(1) : 0;
+        let statusBadge = '<span class="badge badge-success">Audit Compliant</span>';
+        if (fac.flagged > 0) {
+          statusBadge = rate > 35 
+            ? '<span class="badge badge-danger">High Risk Audit</span>' 
+            : '<span class="badge badge-warning">Moderate Variance</span>';
+        }
+
+        const typeBadge = fac.type === 'PHC' 
+          ? `<span class="badge badge-phc">PHC</span>` 
+          : `<span class="badge badge-hc">HC</span>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(fac.name)}</strong></td>
+          <td>${typeBadge}</td>
+          <td class="num-cell">${fac.total}</td>
+          <td class="num-cell" style="color: var(--teal-700); font-weight: 600;">${fac.balanced}</td>
+          <td class="num-cell" style="color: var(--red-700); font-weight: 600;">${fac.flagged}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="flex: 1; height: 5px; background: var(--slate-200); border-radius: 999px; overflow: hidden;">
+                <div style="width: ${rate}%; height: 100%; background: ${rate > 30 ? 'var(--red-600)' : 'var(--amber-600)'};"></div>
+              </div>
+              <span style="font-size: 0.775rem; font-weight: 600; font-family: monospace;">${rate}%</span>
+            </div>
+          </td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">
+            <button class="btn btn-outline btn-sm" onclick="filterBySpecificFacility('${escapeHtml(fac.name)}')">
+              Filter Records
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterBySpecificFacility(facName) {
+      document.getElementById('facility-select').value = facName;
+      switchPage('home');
+      applyFilters();
+    }
+
+    function renderAnalytics() {
+      const typeContainer = document.getElementById('analytics-type-breakdown');
+      const errContainer = document.getElementById('analytics-error-categories');
+      const commTbody = document.getElementById('analytics-commodities-body');
+
+      if (state.allRows.length === 0) return;
+
+      let phcTot = 0, phcFl = 0, hcTot = 0, hcFl = 0;
+      state.allRows.forEach(r => {
+        if (r.facilityType === 'PHC') { phcTot++; if (r.isFlagged) phcFl++; }
+        else { hcTot++; if (r.isFlagged) hcFl++; }
+      });
+
+      const phcRate = phcTot > 0 ? ((phcFl / phcTot) * 100).toFixed(1) : 0;
+      const hcRate = hcTot > 0 ? ((hcFl / hcTot) * 100).toFixed(1) : 0;
+
+      typeContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.825rem;">
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+              <span style="font-weight: 600;">Primary Health Centres (PHC):</span>
+              <span style="font-weight: 700; color: var(--phc-blue);">${phcFl} flagged / ${phcTot} total (${phcRate}%)</span>
+            </div>
+            <div style="height: 6px; background: var(--slate-100); border-radius: 999px; overflow: hidden;">
+              <div style="width: ${phcRate}%; height: 100%; background: var(--phc-blue);"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+              <span style="font-weight: 600;">Health Centres &amp; Hospitals (HC):</span>
+              <span style="font-weight: 700; color: var(--hc-indigo);">${hcFl} flagged / ${hcTot} total (${hcRate}%)</span>
+            </div>
+            <div style="height: 6px; background: var(--slate-100); border-radius: 999px; overflow: hidden;">
+              <div style="width: ${hcRate}%; height: 100%; background: var(--hc-indigo);"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      let deficits = 0, surpluses = 0, negatives = 0, formats = 0;
+      state.flaggedRows.forEach(r => {
+        if (r.errorCategory === 'DEFICIT') deficits++;
+        else if (r.errorCategory === 'SURPLUS') surpluses++;
+        else if (r.errorCategory === 'NEGATIVE') negatives++;
+        else formats++;
+      });
+
+      errContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.825rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Shortage Deficits (Physical count &lt; Calculated balance):</span>
+            <span class="badge badge-danger">${deficits} items</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Excess Surpluses (Physical count &gt; Calculated balance):</span>
+            <span class="badge badge-warning">${surpluses} items</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Negative Stock Anomalies (Reported consumption &gt; available):</span>
+            <span class="badge badge-danger">${negatives} items</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Data Format Anomalies (Non-numeric characters):</span>
+            <span class="badge badge-neutral">${formats} items</span>
+          </div>
+        </div>
+      `;
+
+      const commMap = {};
+      state.allRows.forEach(r => {
+        if (!commMap[r.commodity]) {
+          commMap[r.commodity] = { checked: 0, flagged: 0, variance: 0 };
+        }
+        commMap[r.commodity].checked++;
+        if (r.isFlagged) {
+          commMap[r.commodity].flagged++;
+          commMap[r.commodity].variance += Math.abs(r.discrepancy);
+        }
+      });
+
+      const commList = Object.entries(commMap)
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.flagged - a.flagged)
+        .slice(0, 8);
+
+      commTbody.innerHTML = '';
+      commList.forEach(c => {
+        const rate = ((c.flagged / c.checked) * 100).toFixed(1);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(c.name)}</strong></td>
+          <td class="num-cell">${c.checked}</td>
+          <td class="num-cell" style="color: var(--red-700); font-weight: 700;">${c.flagged}</td>
+          <td><span class="badge ${rate > 35 ? 'badge-danger' : 'badge-warning'}">${rate}%</span></td>
+          <td class="num-cell font-mono">${c.variance.toFixed(0)} units</td>
+        `;
+        commTbody.appendChild(tr);
+      });
+    }
+
+    function generateCsvString(rowsToExport) {
+      if (!rowsToExport || rowsToExport.length === 0) return '';
+      
+      const extraHeaders = [
+        'Flag_Status',
+        'Flag_Reason',
+        'Facility_Classification',
+        'Calculated_Ending_Balance',
+        'Reported_Ending_Balance',
+        'Discrepancy'
+      ];
+
+      const origHeaders = state.headers.filter(h => !extraHeaders.includes(h));
+      const allHeaders = [...extraHeaders, ...origHeaders];
+
+      const escapeCsvCell = (val) => {
+        if (val === null || val === undefined) return '""';
+        const s = String(val).replace(/"/g, '""');
+        return `"${s}"`;
+      };
+
+      const lines = [];
+      lines.push(allHeaders.map(escapeCsvCell).join(','));
+
+      rowsToExport.forEach(item => {
+        const rowObj = item.rawRow || {};
+        const rowVals = [
+          'FLAGGED',
+          item.reasonStr,
+          item.facilityType,
+          item.calculatedEndingBalance,
+          item.reportedEndingBalance,
+          item.discrepancy
+        ];
+        origHeaders.forEach(h => {
+          rowVals.push(rowObj[h] !== undefined ? rowObj[h] : '');
+        });
+        lines.push(rowVals.map(escapeCsvCell).join(','));
+      });
+
+      return '\uFEFF' + lines.join('\r\n');
+    }
+
+    function triggerDownload(content, filename) {
+      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadFlaggedCsv() {
+      if (state.flaggedRows.length === 0) return;
+      const csvStr = generateCsvString(state.flaggedRows);
+      triggerDownload(csvStr, 'flagged.csv');
+    }
+
+    function downloadFilteredCsv() {
+      const filtered = getFilteredRows();
+      if (filtered.length === 0) return;
+      const csvStr = generateCsvString(filtered);
+      triggerDownload(csvStr, `flagged_filtered_${state.activeTypeFilter}.csv`);
+    }
+
+    function downloadBlankTemplate() {
+      const headers = ['Facility Name', 'Facility Type', 'Commodity', 'Beginning Balance', 'Received', 'Dispensed', 'Losses Adjustment', 'Ending Balance'];
+      const sample = ['Sunrise PHC', 'PHC', 'Amoxicillin 500mg Caps', '100', '50', '30', '0', '120'];
+      const csvContent = '\uFEFF' + headers.join(',') + '\r\n' + sample.join(',') + '\r\n';
+      triggerDownload(csvContent, 'template_inventory.csv');
+    }
+
+    function loadSampleData() {
+      const sampleCsv = `Facility Name,Facility Type,Commodity,Beginning Balance,Received,Dispensed,Losses Adjustment,Ending Balance
+Sunrise PHC,PHC,Artemether-Lumefantrine 20/120mg Tabs (AL),450,200,320,5,325
+Sunrise PHC,PHC,Amoxicillin 500mg Caps,300,100,210,0,190
+Sunrise PHC,PHC,Depo-Provera (DMPA-IM) 150mg/ml,291,500,361,5,447
+Greenfield PHC,PHC,Paracetamol 500mg Tabs,506,300,470,0,347
+Greenfield PHC,PHC,Oral Rehydration Salts (ORS) Sachets,600,0,150,0,450
+Greenfield PHC,PHC,Zinc Sulfate 20mg Dispersible Tabs,250,100,80,5,265
+Riverside PHC,PHC,Amoxicillin 500mg Caps,611,50,533,0,121
+Riverside PHC,PHC,Oxytocin 10 IU/ml Ampoules,120,50,60,0,110
+Riverside PHC,PHC,Malaria Rapid Diagnostic Test (mRDT) Kits,350,200,180,10,360
+Hope Community PHC,PHC,Male Condoms (Pieces),427,500,477,2,498
+Hope Community PHC,PHC,Ferrous Sulfate 200mg + Folic Acid 0.4mg,380,100,190,0,290
+Hope Community PHC,PHC,Cotrimoxazole 480mg Tabs,210,0,95,0,115
+Oak Valley PHC,PHC,HIV 1/2 Rapid Test Kits,609,300,457,15,426
+Oak Valley PHC,PHC,Artemether-Lumefantrine 20/120mg Tabs (AL),520,100,250,0,370
+Harmony Rural PHC,PHC,Depo-Provera (DMPA-IM) 150mg/ml,180,100,90,0,190
+Harmony Rural PHC,PHC,Oral Rehydration Salts (ORS) Sachets,400,200,310,0,290
+St. Jude Health Centre,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),750,300,620,10,420
+St. Jude Health Centre,HC,Amoxicillin 500mg Caps,820,400,550,20,650
+St. Jude Health Centre,HC,Oxytocin 10 IU/ml Ampoules,280,100,140,0,240
+Central City HC,HC,Malaria Rapid Diagnostic Test (mRDT) Kits,900,500,750,0,650
+Central City HC,HC,HIV 1/2 Rapid Test Kits,450,200,380,5,265
+Central City HC,HC,Paracetamol 500mg Tabs,800,400,620,15,565
+Victoria Memorial HC,HC,Depo-Provera (DMPA-IM) 150mg/ml,520,300,410,0,410
+Victoria Memorial HC,HC,Cotrimoxazole 480mg Tabs,610,200,350,10,450
+North Metro HC,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),680,400,590,0,490
+North Metro HC,HC,Zinc Sulfate 20mg Dispersible Tabs,340,100,180,0,260
+Highland District HC,HC,Depo-Provera (DMPA-IM) 150mg/ml,750,300,225,10,801
+Highland District HC,HC,Amoxicillin 500mg Caps,500,200,350,0,350
+Mercy General HC,HC,Oral Rehydration Salts (ORS) Sachets,650,300,480,5,465
+Mercy General HC,HC,Male Condoms (Pieces),1200,500,850,20,830`;
+
+      processData(sampleCsv, 'sample_inventory_data.csv');
+    }
+
+    function handleFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        processData(evt.target.result, file.name);
+      };
+      reader.readAsText(file);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSampleData();
+    });
+  </script>
+</body>
+</html>

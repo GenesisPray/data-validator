@@ -1,0 +1,40 @@
+﻿Flag_Status,Flag_Reason,Facility_Classification,Calculated_Ending_Balance,Reported_Ending_Balance,Discrepancy,Facility Name,Facility Type,Commodity,Beginning Balance,Received,Dispensed,Losses Adjustment,Ending Balance
+FLAGGED,Deficit Discrepancy: Reported EB (801.0) < Calculated EB (815.00) by -14.00,HC,815.0,801.0,-14.0,Highland District HC,HC,Depo-Provera (DMPA-IM) 150mg/ml,587,300,67,5,801
+FLAGGED,Surplus Discrepancy: Reported EB (83.0) > Calculated EB (36.00) by +47.00,HC,36.0,83.0,47.0,St. Jude Health Centre,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),99,200,263,0,83
+FLAGGED,Negative Stock: Dispensed + Losses (251.0) exceed Available (230.0) by 21.00; Surplus Discrepancy: Reported EB (0.0) > Calculated EB (-21.00) by +21.00,HC,-21.0,0.0,21.0,Mercy General HC,HC,Ferrous Sulfate 200mg + Folic Acid 0.4mg,230,0,251,0,0
+FLAGGED,Surplus Discrepancy: Reported EB (447.0) > Calculated EB (425.00) by +22.00,PHC,425.0,447.0,22.0,Sunrise PHC,PHC,Depo-Provera (DMPA-IM) 150mg/ml,291,500,361,5,447
+FLAGGED,Surplus Discrepancy: Reported EB (347.0) > Calculated EB (336.00) by +11.00,PHC,336.0,347.0,11.0,Greenfield PHC,PHC,Paracetamol 500mg Tabs,506,300,470,0,347
+FLAGGED,Deficit Discrepancy: Reported EB (660.0) < Calculated EB (671.00) by -11.00,HC,671.0,660.0,-11.0,Victoria Memorial HC,HC,Paracetamol 500mg Tabs,734,0,58,5,660
+FLAGGED,Deficit Discrepancy: Reported EB (426.0) < Calculated EB (437.00) by -11.00,PHC,437.0,426.0,-11.0,Oak Valley PHC,PHC,HIV 1/2 Rapid Test Kits,609,300,457,15,426
+FLAGGED,Deficit Discrepancy: Reported EB (121.0) < Calculated EB (128.00) by -7.00,PHC,128.0,121.0,-7.0,Riverside PHC,PHC,Amoxicillin 500mg Caps,611,50,533,0,121
+FLAGGED,Surplus Discrepancy: Reported EB (498.0) > Calculated EB (448.00) by +50.00,PHC,448.0,498.0,50.0,Hope Community PHC,PHC,Male Condoms (Pieces),427,500,477,2,498
+FLAGGED,Surplus Discrepancy: Reported EB (152.0) > Calculated EB (112.00) by +40.00,HC,112.0,152.0,40.0,Victoria Memorial HC,HC,Oral Rehydration Salts (ORS) Sachets,305,50,243,0,152
+FLAGGED,Deficit Discrepancy: Reported EB (172.0) < Calculated EB (189.00) by -17.00,HC,189.0,172.0,-17.0,Central City HC,HC,Cotrimoxazole 480mg Tabs,238,100,134,15,172
+FLAGGED,Deficit Discrepancy: Reported EB (138.0) < Calculated EB (164.00) by -26.00,HC,164.0,138.0,-26.0,Central City HC,HC,Malaria Rapid Diagnostic Test (mRDT) Kits,260,200,286,10,138
+FLAGGED,Surplus Discrepancy: Reported EB (57.0) > Calculated EB (22.00) by +35.00,PHC,22.0,57.0,35.0,Hope Community PHC,PHC,Zinc Sulfate 20mg Dispersible Tabs,133,0,109,2,57
+FLAGGED,Deficit Discrepancy: Reported EB (506.0) < Calculated EB (522.00) by -16.00,HC,522.0,506.0,-16.0,Victoria Memorial HC,HC,Amoxicillin 500mg Caps,468,300,244,2,506
+FLAGGED,Surplus Discrepancy: Reported EB (57.0) > Calculated EB (22.00) by +35.00,PHC,22.0,57.0,35.0,Sunrise PHC,PHC,Artemether-Lumefantrine 20/120mg Tabs (AL),71,0,44,5,57
+FLAGGED,Surplus Discrepancy: Reported EB (568.0) > Calculated EB (554.00) by +14.00,HC,554.0,568.0,14.0,St. Jude Health Centre,HC,Ferrous Sulfate 200mg + Folic Acid 0.4mg,584,500,520,10,568
+FLAGGED,Surplus Discrepancy: Reported EB (600.0) > Calculated EB (559.00) by +41.00,HC,559.0,600.0,41.0,Central City HC,HC,Paracetamol 500mg Tabs,754,200,395,0,600
+FLAGGED,Deficit Discrepancy: Reported EB (326.0) < Calculated EB (354.00) by -28.00,HC,354.0,326.0,-28.0,Victoria Memorial HC,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),508,0,144,10,326
+FLAGGED,Deficit Discrepancy: Reported EB (607.0) < Calculated EB (644.00) by -37.00,HC,644.0,607.0,-37.0,Central City HC,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),682,300,338,0,607
+FLAGGED,Surplus Discrepancy: Reported EB (562.0) > Calculated EB (541.00) by +21.00,PHC,541.0,562.0,21.0,Hope Community PHC,PHC,Oxytocin 10 IU/ml Ampoules,509,200,168,0,562
+FLAGGED,Deficit Discrepancy: Reported EB (887.0) < Calculated EB (904.00) by -17.00,HC,904.0,887.0,-17.0,Central City HC,HC,Male Condoms (Pieces),725,200,21,0,887
+FLAGGED,Deficit Discrepancy: Reported EB (239.0) < Calculated EB (245.00) by -6.00,HC,245.0,239.0,-6.0,Central City HC,HC,Paracetamol 500mg Tabs,472,0,227,0,239
+FLAGGED,Deficit Discrepancy: Reported EB (0.0) < Calculated EB (19.00) by -19.00,PHC,19.0,0.0,-19.0,Sunrise PHC,PHC,Depo-Provera (DMPA-IM) 150mg/ml,379,0,360,0,0
+FLAGGED,Surplus Discrepancy: Reported EB (323.0) > Calculated EB (290.00) by +33.00,HC,290.0,323.0,33.0,Central City HC,HC,Cotrimoxazole 480mg Tabs,471,200,381,0,323
+FLAGGED,Surplus Discrepancy: Reported EB (417.0) > Calculated EB (370.00) by +47.00,HC,370.0,417.0,47.0,Highland District HC,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),665,50,340,5,417
+FLAGGED,Surplus Discrepancy: Reported EB (417.0) > Calculated EB (373.00) by +44.00,PHC,373.0,417.0,44.0,Harmony Rural PHC,PHC,HIV 1/2 Rapid Test Kits,120,300,47,0,417
+FLAGGED,Deficit Discrepancy: Reported EB (63.0) < Calculated EB (81.00) by -18.00,HC,81.0,63.0,-18.0,Highland District HC,HC,Oral Rehydration Salts (ORS) Sachets,295,200,414,0,63
+FLAGGED,Deficit Discrepancy: Reported EB (365.0) < Calculated EB (385.00) by -20.00,HC,385.0,365.0,-20.0,North Metro HC,HC,Amoxicillin 500mg Caps,273,300,188,0,365
+FLAGGED,Surplus Discrepancy: Reported EB (550.0) > Calculated EB (516.00) by +34.00,PHC,516.0,550.0,34.0,Sunrise PHC,PHC,Artemether-Lumefantrine 20/120mg Tabs (AL),607,50,126,15,550
+FLAGGED,Deficit Discrepancy: Reported EB (238.0) < Calculated EB (269.00) by -31.00,HC,269.0,238.0,-31.0,Victoria Memorial HC,HC,Depo-Provera (DMPA-IM) 150mg/ml,470,0,201,0,238
+FLAGGED,Deficit Discrepancy: Reported EB (0.0) < Calculated EB (20.00) by -20.00,PHC,20.0,0.0,-20.0,Riverside PHC,PHC,Zinc Sulfate 20mg Dispersible Tabs,58,300,338,0,0
+FLAGGED,Negative Stock: Dispensed + Losses (706.0) exceed Available (676.0) by 30.00; Surplus Discrepancy: Reported EB (0.0) > Calculated EB (-30.00) by +30.00,HC,-30.0,0.0,30.0,Mercy General HC,HC,Artemether-Lumefantrine 20/120mg Tabs (AL),676,0,706,0,0
+FLAGGED,Surplus Discrepancy: Reported EB (177.0) > Calculated EB (131.00) by +46.00,PHC,131.0,177.0,46.0,Greenfield PHC,PHC,Depo-Provera (DMPA-IM) 150mg/ml,152,500,506,15,177
+FLAGGED,Deficit Discrepancy: Reported EB (400.0) < Calculated EB (431.00) by -31.00,HC,431.0,400.0,-31.0,Highland District HC,HC,Oral Rehydration Salts (ORS) Sachets,699,50,308,10,400
+FLAGGED,Surplus Discrepancy: Reported EB (67.0) > Calculated EB (20.00) by +47.00,HC,20.0,67.0,47.0,Central City HC,HC,Malaria Rapid Diagnostic Test (mRDT) Kits,408,100,473,15,67
+FLAGGED,Surplus Discrepancy: Reported EB (438.0) > Calculated EB (398.00) by +40.00,HC,398.0,438.0,40.0,Victoria Memorial HC,HC,Malaria Rapid Diagnostic Test (mRDT) Kits,604,0,204,2,438
+FLAGGED,Surplus Discrepancy: Reported EB (233.0) > Calculated EB (217.00) by +16.00,HC,217.0,233.0,16.0,Mercy General HC,HC,Zinc Sulfate 20mg Dispersible Tabs,70,200,48,5,233
+FLAGGED,Surplus Discrepancy: Reported EB (48.0) > Calculated EB (4.00) by +44.00,PHC,4.0,48.0,44.0,Greenfield PHC,PHC,HIV 1/2 Rapid Test Kits,464,50,510,0,48
+FLAGGED,Surplus Discrepancy: Reported EB (491.0) > Calculated EB (478.00) by +13.00,PHC,478.0,491.0,13.0,Greenfield PHC,PHC,Male Condoms (Pieces),709,200,426,5,491
